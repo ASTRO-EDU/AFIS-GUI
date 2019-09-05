@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- # ==========================================================================
+  #
+  #
+  # Copyright (C) 2019 INAF - OAS Bologna
+  # Author: Nicolo' Parmiggiani <nicolo.parmiggiani@inaf.com>
+  #
+  # This program is free software: you can redistribute it and/or modify
+  # it under the terms of the GNU General Public License as published by
+  # the Free Software Foundation, either version 3 of the License, or
+  # (at your option) any later version.
+  #
+  # This program is distributed in the hope that it will be useful,
+  # but WITHOUT ANY WARRANTY; without even the implied warranty of
+  # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  # GNU General Public License for more details.
+  #
+  # You should have received a copy of the GNU General Public License
+  # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  #
+  # ========================================================================== -->
+
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+  <script src="js/jquery-3.0.0.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+
+
+  <link rel="stylesheet" type="text/css" href="DataTables/dataTables.bootstrap.min.css">
+  <script type="text/javascript" charset="utf8" src="DataTables/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="DataTables/dataTables.bootstrap.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="css/grawita_gui.css">
+
+  <title>Super GRAWITA</title>
+
+  <!-- Bootstrap -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+
+  <script language = "javascript" type = "text/javascript">
+
+
+
+
+  function load_data()
+  {
+
+    var url = new URL(window.location.href);
+    grace_id = url.searchParams.get("grace_id");
+    trigger_time_utc = url.searchParams.get("trigger_time_utc");
+    seqnum = url.searchParams.get("seqnum");
+
+    document.getElementById("event_id").innerHTML=grace_id
+    document.getElementById("tzero_utc").innerHTML=trigger_time_utc
+    document.getElementById("triggerid_seqnum").innerHTML=seqnum
+
+    var curr = new Date();
+    console.log(curr)
+    var iso = curr.toISOString();
+    var currdate = iso.split(".")[0];
+
+    document.getElementById("current_time_nav_bar").innerHTML=currdate+" (UTC)"
+
+
+    $.ajax({
+      cache: false,
+      url:'backend/get_event_data.php',
+      type:'get',
+      data: {'grace_id':grace_id,'trigger_time_utc':trigger_time_utc},
+      contentType: "application/json; charset=utf-8",
+      async: true
+
+    }).done(function (data) {
+
+      console.log(data)
+      var data_json = JSON.parse(data);
+
+      var container = document.getElementById("container")
+
+      ////////  AGILE
+
+      var agile = document.createElement('h2');
+      agile.innerHTML="AGILE DATA";
+      container.appendChild(agile)
+
+      agile_png_array = data_json['agile']
+
+      var new_row_div = ""
+
+      for (var r = 0; r < agile_png_array.length; r++) {
+
+        agile_title = agile_png_array[r].title
+        agile_image = agile_png_array[r].image_path
+        agile_comment = agile_png_array[r].comment
+        console.log(agile_image)
+        console.log(agile_comment)
+
+        if(r%4 == 0)
+        {
+          new_row_div = document.createElement('div');
+          new_row_div.className = 'row';
+          new_row_div.style.paddingTop="20px";
+        }
+
+          id = r
+
+          var column = document.createElement('div');
+          column.className = 'col-lg-3 col-md-12 col-md-12 col-md-12';
+          column.style.paddingLeft="0px";
+          column.style.paddingRight="0px";
+
+          var title = document.createElement('h5');
+          title.className = 'text-center';
+          title.id = 'comment_image'+id;
+          title.innerHTML=agile_title;
+
+          var comment = document.createElement('pre');
+          //comment.className = 'text-center';
+          comment.id = 'comment_image'+id;
+          comment.innerHTML=agile_comment;
+
+          var link = document.createElement('a');
+          link.id = 'link_image_'+id;
+          link.href=agile_image
+
+          var img = document.createElement('img');
+          img.className = 'img-responsive';
+          img.id = 'image_'+id;
+          img.src=agile_image
+
+
+          link.appendChild(img)
+          column.appendChild(title)
+          column.appendChild(link)
+          column.appendChild(comment)
+          new_row_div.appendChild(column)
+
+
+          container.appendChild(new_row_div)
+
+
+      }
+
+    }).fail(function (jqXHR, textStatus) {
+      console.log("error");
+      console.log(textStatus);
+    });
+  }
+
+  </script>
+
+</head>
+
+<body onload="load_data();">
+
+
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar" >
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" id="website_name" href="index.html">Super GRAWITA</a>
+      </div>
+
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li ><a href="index.html">LIGO Events</a></li>
+          <li class="dropdown">
+                  <p class="navbar-text" id="current_time_nav_bar"></p>
+          </li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+
+  </nav>
+
+  <div id = "container" class="container-fluid">
+    <div class="row" style="padding-top:20px;">
+      <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 ">
+          <table>
+            <tr>
+              <td style="text-align:right; padding-right:20px"><b>Event ID</b></td>
+              <td id="event_id" style="text-align:left"></td>
+            </tr>
+            <tr>
+              <td style="text-align:right; padding-right:20px"><b>Triggerid_seqnum</b></td>
+              <td id="triggerid_seqnum" style="text-align:left"></td>
+            </tr>
+            <tr>
+              <td style="text-align:right; padding-right:20px"><b>Event T0 (UTC)</b></td>
+              <td id="tzero_utc" style="text-align:left"></td>
+            </tr>
+          </table>
+      </div>
+    </div>
+
+    <div class="row" style="padding-top:20px; display:none;" id="alert-table-row">
+
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " id="alert-table-div">
+        <h3>LIGO Notices</h3>
+        <table id="alert-table" class = "table table-striped  dt-responsive" cellspacing="0" width="100%"> </table>
+      </div>
+    </div>
+
+  </div><!-- /.container -->
+
+</body>
+</html>

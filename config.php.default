@@ -1,0 +1,29 @@
+<?php
+
+  // copy this file to config.php and change the configurations without commiting the new file with git.
+
+  function getConfig()
+  {
+      // db data
+      $username = "";
+      $password = "";
+      $database = "";
+      $port = "";
+      $database_monitoring = "";
+      $database_mcal = "";
+      $host = "";
+      $dir_analysis = "";
+      $link_web_analysis = "";
+      $base_restults_dir = "";
+      $agilepipe_dir = "";
+
+
+      $array = array('host'=>$host,'port'=>$port,'username' => $username,'password' => $password,
+      'database' => $database,'dir_analysis'=>$dir_analysis,'link_web_analysis'=>$link_web_analysis,
+      'database_monitoring'=>$database_monitoring,'database_mcal'=>$database_mcal,
+      'base_restults_dir'=>$base_restults_dir,'agilepipe_dir'=>$agilepipe_dir);
+
+      return $array;
+  }
+
+?>

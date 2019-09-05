@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- # ==========================================================================
+  #
+  #
+  # Copyright (C) 2019 INAF - OAS Bologna
+  # Author: Nicolo' Parmiggiani <nicolo.parmiggiani@inaf.com>
+  #
+  # This program is free software: you can redistribute it and/or modify
+  # it under the terms of the GNU General Public License as published by
+  # the Free Software Foundation, either version 3 of the License, or
+  # (at your option) any later version.
+  #
+  # This program is distributed in the hope that it will be useful,
+  # but WITHOUT ANY WARRANTY; without even the implied warranty of
+  # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  # GNU General Public License for more details.
+  #
+  # You should have received a copy of the GNU General Public License
+  # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  #
+  # ========================================================================== -->
+
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+  <script src="js/jquery-3.0.0.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+
+
+  <link rel="stylesheet" type="text/css" href="DataTables/dataTables.bootstrap.min.css">
+  <script type="text/javascript" charset="utf8" src="DataTables/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="DataTables/dataTables.bootstrap.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="css/grawita_gui.css">
+
+  <title>Super GRAWITA</title>
+
+  <!-- Bootstrap -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+
+  <script language = "javascript" type = "text/javascript">
+
+  var grace_id = "";
+  function uploadFile() {
+
+
+    //var file = new FormData(document.getElementById("upload"));
+    var mission_name = document.getElementById("mission_name").value
+    var password = document.getElementById("password").value
+    var comments = document.getElementById("image_comment").value
+
+
+    var file = new FormData(document.getElementById("upload"));
+    var file_data = document.getElementById("file").files[0]   // Getting the properties of file from file field
+    var form_data = new FormData();                  // Creating object of FormData class
+    form_data.append("file", file_data)              // Appending parameter named file with properties of file_field to form_data
+    form_data.append("grace_id", grace_id)
+    form_data.append("mission_name", mission_name)
+    form_data.append("password", password)
+    form_data.append("comments", comments)
+    $.ajax({
+      url: "backend/upload_image.php",
+      type: "POST",
+      data: form_data,
+      enctype: 'multipart/form-data',
+      contentType: false,
+      //cache: false,
+      processData: false,
+    }).done(function( data ) {
+
+      console.log( data );
+
+
+    });
+    return false;
+
+  }
+
+  function load_data()
+  {
+    var url = new URL(window.location.href);
+    grace_id = url.searchParams.get("grace_id");
+    var instrument_name = "LIGO"
+
+    var curr = new Date();
+    console.log(curr)
+    var iso = curr.toISOString();
+    var currdate = iso.split(".")[0];
+
+    document.getElementById("event_id").innerHTML="Event ID: "+grace_id
+    document.getElementById("current_time_nav_bar").innerHTML=currdate+" (UTC)"
+
+  }
+
+  </script>
+
+</head>
+
+<body onload="load_data();">
+
+
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar" >
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" id="website_name" href="index.html">Super GRAWITA</a>
+      </div>
+
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li ><a href="index.html">LIGO Events</a></li>
+          <li class="dropdown">
+                  <p class="navbar-text" id="current_time_nav_bar"></p>
+          </li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+
+  </nav>
+
+  <div class="container-fluid">
+
+    <h3 id="event_id"></h3>
+    <div class="row" style="padding-top:20px;" id="form">
+
+    <label for = "mission_name" >Select Mission</label>
+    <select class="form-control" id="mission_name">
+      <option value="AGILE">AGILE</option>
+      <option value="FERMI">FERMI</option>
+      <option value="GRAWITA">GRAWITA</option>
+      <option value="INTEGRAL">INTEGRAL</option>
+    </select>
+
+
+
+    <form id="upload" enctype="multipart/form-data">
+      <label id="upload_label" for = "error">Upload Image file</label>
+        <input id='file' name="file" type="file" />
+    </form>
+
+    <label for = "image_comment">Image Comment</label>
+    <textarea class="form-control" rows="5" id="image_comment"></textarea>
+    <br>
+    <label >Password for upload</label>
+    <input type = "text" class = "form-control" id="password" placeholder = "password" value="">
+    <br>
+    <input type="button" value="Upload" onclick="uploadFile();" class="btn btn-success center-block btn-block" />
+
+    </div>
+
+  </div><!-- /.container -->
+
+</body>
+</html>

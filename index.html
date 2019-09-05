@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- # ==========================================================================
+  #
+  #
+  # Copyright (C) 2019 INAF - OAS Bologna
+  # Author: Nicolo' Parmiggiani <nicolo.parmiggiani@inaf.com>
+  #
+  # This program is free software: you can redistribute it and/or modify
+  # it under the terms of the GNU General Public License as published by
+  # the Free Software Foundation, either version 3 of the License, or
+  # (at your option) any later version.
+  #
+  # This program is distributed in the hope that it will be useful,
+  # but WITHOUT ANY WARRANTY; without even the implied warranty of
+  # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  # GNU General Public License for more details.
+  #
+  # You should have received a copy of the GNU General Public License
+  # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  #
+  # ========================================================================== -->
+
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+  <script src="js/jquery-3.0.0.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+
+
+  <link rel="stylesheet" type="text/css" href="DataTables/dataTables.bootstrap.min.css">
+  <script type="text/javascript" charset="utf8" src="DataTables/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" charset="utf8" src="DataTables/dataTables.bootstrap.min.js"></script>
+
+  <link rel="stylesheet" type="text/css" href="css/grawita_gui.css">
+
+  <title>Super GRAWITA</title>
+
+  <!-- Bootstrap -->
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+
+
+  <script language = "javascript" type = "text/javascript">
+
+
+
+
+  function load_data()
+  {
+
+    var instrument_name = "LIGO"
+
+    var curr = new Date();
+    console.log(curr)
+    var iso = curr.toISOString();
+    var currdate = iso.split(".")[0];
+
+    document.getElementById("current_time_nav_bar").innerHTML=currdate+" (UTC)"
+
+    console.log(instrument_name);
+
+    $.ajax({
+      cache: false,
+      url:'backend/get_ligo_notices.php',
+      type:'get',
+      data: {'instrument_name':instrument_name},
+      contentType: "application/json; charset=utf-8",
+      async: true
+
+    }).done(function (data) {
+
+      console.log(data)
+      var data_json = JSON.parse(data);
+      console.log(data_json);
+
+      var alert_list = data_json['alert_list']
+      var dataSet = new Array();
+      for (var i = 0; i < alert_list.length; i++) {
+
+        var alert = alert_list[i];
+
+
+        var trigger_time = alert.trigger_time;
+        var trigger_time_utc = alert.trigger_time_utc;
+        var intr_name = alert.intr_name;
+        var notice_time = alert.notice_time;
+        var triggerid = alert.triggerid;
+        var seqnum = alert.seqnum;
+        var link_results = alert.link_results;
+        var grace_id = alert.grace_id;
+        var bns = alert.bns;
+        var bbh = alert.bbh;
+        var nsbh = alert.nsbh;
+        var mass_gap = alert.mass_gap;
+        var has_ns = alert.has_ns;
+        var has_remnant = alert.has_remnant;
+        var far = alert.far;
+        var terrestrial = alert.terrestrial;
+
+        dataSet[i] = new Array();
+
+        for (var j = 0; j <=5; j++) {
+
+          if(j==0)
+          {
+            dataSet[i][j] =grace_id;
+          }
+          if(j==1)
+          {
+            dataSet[i][j] =trigger_time_utc;
+          }
+          if(j==2)
+          {
+            dataSet[i][j] =notice_time;
+          }
+          if(j==3){
+            dataSet[i][j] =far;
+          }
+          if(j==4){
+            dataSet[i][j] ="BNS: "+bns+"<br>BBH: "+bbh+"<br>NSBH: "+nsbh+"<br>Terrestrial: "+terrestrial;
+          }
+          if(j==5){
+
+            link_upload = "upload.html?grace_id="+grace_id;
+            link_full = "full_results.html?grace_id="+grace_id+"&trigger_time_utc="+trigger_time_utc+"&seqnum="+seqnum;
+            dataSet[i][j] = '<button type="submit" onclick="window.open(\''+link_full+'\'); return false;" 	class="btn btn-success" >Results</button><br>';
+            dataSet[i][j] += '<button type="submit" style="margin-top:10px;"   onclick="window.open(\''+link_upload+'\'); return false;" 	class="btn btn-success" >Upload Data</button><br>';
+          }
+        }
+
+
+      }
+      if ( $.fn.dataTable.isDataTable('#alert-table') ) // se la tabella esiste già
+      {
+        var table = new $.fn.dataTable.Api('#alert-table').clear();
+        table.rows.add(dataSet).draw();
+      }
+      else
+      {
+        var table = $('#alert-table').DataTable( {
+          //"autoWidth": true,
+          "pageLength": 50,
+          //"bSort" : false,
+          "aaSorting": [],
+          columns: [
+
+            { title: "Event id" },
+            { title: "trigger time (UTC)" },
+            { title: "notice time (UTC)" },
+            { title: "Far" },
+            { title: "Event Type" },
+            { title: "link" },
+
+          ]
+        } );
+        table.rows.add(dataSet).draw();
+      }
+      document.getElementById('alert-table-row').style.display="block";
+      $('#alert-table').resize();
+
+    }).fail(function (jqXHR, textStatus) {
+      console.log("error");
+      console.log(textStatus);
+    });
+  }
+
+  </script>
+
+</head>
+
+<body onload="load_data();">
+
+
+  <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar" >
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" id="website_name" href="index.html">Super GRAWITA</a>
+      </div>
+
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li ><a href="index.html">LIGO Events</a></li>
+          <li class="dropdown">
+                  <p class="navbar-text" id="current_time_nav_bar"></p>
+          </li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+
+  </nav>
+
+  <div class="container-fluid">
+
+
+    <div class="row" style="padding-top:20px; display:none;" id="alert-table-row">
+
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " id="alert-table-div">
+        <h3>LIGO Notices</h3>
+        <table id="alert-table" class = "table table-striped  dt-responsive" cellspacing="0" width="100%"> </table>
+      </div>
+    </div>
+
+  </div><!-- /.container -->
+
+</body>
+</html>

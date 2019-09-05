@@ -10,8 +10,6 @@ $config = getConfig();
 $dir_analysis = $config['dir_analysis'];
 $link_web_analysis = $config['link_web_analysis'];
 
-$dbh = new PDO('mysql:host='.$config['host'].';dbname='.$config['database'].';port='.$config['port'],$config['username'],$config['password']);
-
 $results_dir = $dir_analysis."/GRAWITA/".$grace_id;
 
 $image_array = array();
@@ -55,6 +53,19 @@ foreach (glob($results_dir."/INTEGRAL*.{jpg,jpeg,png}",GLOB_BRACE) as $filename)
 }
 
 $image_array["integral"]=$intgral_image_array;
+
+$fermi_image_array = array();
+foreach (glob($results_dir."/FERMI*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
+
+    $comment_path = str_replace(array(".png",".jpg",".jpeg"),".txt",$filename);
+    $comment = file_get_contents($comment_path);
+
+    $image = str_replace($dir_analysis,$link_web_analysis,$filename);
+
+    array_push($fermi_image_array,array("title"=>basename($filename),"image_path"=>$image,"comment"=>$comment));
+}
+
+$image_array["fermi"]=$fermi_image_array;
 
 echo json_encode($image_array);
 

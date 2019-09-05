@@ -78,6 +78,20 @@
 
       console.log( data );
 
+      if(data == "good"){
+          document.getElementById("request_response").innerHTML="Upload succees"
+          document.getElementById("request_response").style.color = "green";
+      }
+
+      if(data=="bad"){
+          document.getElementById("request_response").innerHTML="Upload error"
+          document.getElementById("request_response").style.color = "red";
+      }
+      if(data=="badpassword"){
+          document.getElementById("request_response").innerHTML="Password error"
+          document.getElementById("request_response").style.color = "red";
+      }
+
 
     });
     return false;
@@ -158,6 +172,7 @@
     <label >Password for upload</label>
     <input type = "text" class = "form-control" id="password" placeholder = "password" value="">
     <br>
+    <label id="request_response" ></label>
     <input type="button" value="Upload" onclick="uploadFile();" class="btn btn-success center-block btn-block" />
 
     </div>

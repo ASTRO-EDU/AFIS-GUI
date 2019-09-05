@@ -48,7 +48,62 @@
 
   <script language = "javascript" type = "text/javascript">
 
+  function add_images(data_array,container){
 
+    var new_row_div = ""
+
+    for (var r = 0; r < data_array.length; r++) {
+
+      title_txt = data_array[r].title
+      image_path = data_array[r].image_path
+      comment_txt = data_array[r].comment
+
+      if(r%4 == 0)
+      {
+        new_row_div = document.createElement('div');
+        new_row_div.className = 'row';
+        new_row_div.style.paddingTop="20px";
+      }
+
+        id = r
+
+        var column = document.createElement('div');
+        column.className = 'col-lg-3 col-md-12 col-md-12 col-md-12';
+        column.style.paddingLeft="0px";
+        column.style.paddingRight="0px";
+
+        var title = document.createElement('h5');
+        title.className = 'text-center';
+        title.id = 'comment_image'+id;
+        title.innerHTML=title_txt;
+
+        var comment = document.createElement('pre');
+        //comment.className = 'text-center';
+        comment.id = 'comment_image'+id;
+        comment.innerHTML=comment_txt;
+
+        var link = document.createElement('a');
+        link.id = 'link_image_'+id;
+        link.href=image_path
+
+        var img = document.createElement('img');
+        img.className = 'img-responsive';
+        img.id = 'image_'+id;
+        img.src=image_path
+
+
+        link.appendChild(img)
+        column.appendChild(title)
+        column.appendChild(link)
+        column.appendChild(comment)
+        new_row_div.appendChild(column)
+
+
+        container.appendChild(new_row_div)
+
+    }
+
+  }
 
 
   function load_data()
@@ -91,64 +146,34 @@
       var agile = document.createElement('h2');
       agile.innerHTML="AGILE DATA";
       container.appendChild(agile)
+      agile_array = data_json['agile']
+      add_images(agile_array,container)
 
-      agile_png_array = data_json['agile']
+      ////////  FERMI
 
-      var new_row_div = ""
+      var fermi = document.createElement('h2');
+      fermi.innerHTML="FERMI DATA";
+      container.appendChild(fermi)
+      fermi_array = data_json['fermi']
+      add_images(fermi_array,container)
 
-      for (var r = 0; r < agile_png_array.length; r++) {
+      ////////  INTEGRAL
 
-        agile_title = agile_png_array[r].title
-        agile_image = agile_png_array[r].image_path
-        agile_comment = agile_png_array[r].comment
-        console.log(agile_image)
-        console.log(agile_comment)
+      var integral = document.createElement('h2');
+      integral.innerHTML="INTEGRAL DATA";
+      container.appendChild(integral)
+      integral_array = data_json['integral']
+      add_images(integral_array,container)
 
-        if(r%4 == 0)
-        {
-          new_row_div = document.createElement('div');
-          new_row_div.className = 'row';
-          new_row_div.style.paddingTop="20px";
-        }
+      ////////  GRAWITA
 
-          id = r
-
-          var column = document.createElement('div');
-          column.className = 'col-lg-3 col-md-12 col-md-12 col-md-12';
-          column.style.paddingLeft="0px";
-          column.style.paddingRight="0px";
-
-          var title = document.createElement('h5');
-          title.className = 'text-center';
-          title.id = 'comment_image'+id;
-          title.innerHTML=agile_title;
-
-          var comment = document.createElement('pre');
-          //comment.className = 'text-center';
-          comment.id = 'comment_image'+id;
-          comment.innerHTML=agile_comment;
-
-          var link = document.createElement('a');
-          link.id = 'link_image_'+id;
-          link.href=agile_image
-
-          var img = document.createElement('img');
-          img.className = 'img-responsive';
-          img.id = 'image_'+id;
-          img.src=agile_image
+      var grawita = document.createElement('h2');
+      grawita.innerHTML="GRAWITA DATA";
+      container.appendChild(grawita)
+      grawita_array = data_json['grawita']
+      add_images(grawita_array,container)
 
 
-          link.appendChild(img)
-          column.appendChild(title)
-          column.appendChild(link)
-          column.appendChild(comment)
-          new_row_div.appendChild(column)
-
-
-          container.appendChild(new_row_div)
-
-
-      }
 
     }).fail(function (jqXHR, textStatus) {
       console.log("error");

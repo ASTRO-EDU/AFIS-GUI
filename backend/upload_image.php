@@ -18,27 +18,25 @@ $mission_name = $_POST['mission_name'];
 $password = $_POST['password'];
 $comments = $_POST['comments'];
 
-print($mission_name."\n");
-print($password."\n");
 
 if($mission_name=="AGILE" && $password!="a" )
 {
-  echo "bad";
+  echo "badpassword";
   exit();
 }
 if($mission_name=="INTEGRAL" && $password!="integralu" )
 {
-  echo "bad";
+  echo "badpassword";
   exit();
 }
 if($mission_name=="GRAWITA" && $password!="grawitau" )
 {
-  echo "bad";
+  echo "badpassword";
   exit();
 }
 if($mission_name=="FERMI" && $password!="fermiu" )
 {
-  echo "bad";
+  echo "badpassword";
   exit();
 }
 
@@ -51,17 +49,16 @@ if(!file_exists ( $dir_analysis )){
 
 $extension =  array('png','jpg',"jpeg");
 $file_extension = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
-print($file_extension."\n");
+
 if(!in_array($file_extension,$extension) ) {
     echo 'bad';
+    exit();
 }
 else
 {
 
   $uploadfile = $dir_analysis."/".$mission_name."_".$_FILES['file']['name'];
   $comment_file = str_replace(array(".png",".jpg",".jpeg"),".txt",$uploadfile);
-  print($comments."\n");
-  print($comment_file."\n");
 
   if(file_put_contents($comment_file,$comments)!=false){
 
@@ -69,13 +66,14 @@ else
   }
   else{
     	echo "bad";
+      exit();
   }
 
 	if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) {
 
 		  chmod($uploadfile, 0664);
 
-    	echo $uploadfile;
+    	echo "good";
 	} else {
     	echo "bad";
 }

@@ -19,22 +19,22 @@ $password = $_POST['password'];
 $comments = $_POST['comments'];
 
 
-if($mission_name=="AGILE" && $password!="a" )
+if($mission_name=="AGILE" && $password!="agile" )
 {
   echo "badpassword";
   exit();
 }
-if($mission_name=="INTEGRAL" && $password!="integralu" )
+if($mission_name=="INTEGRAL" && $password!="integral" )
 {
   echo "badpassword";
   exit();
 }
-if($mission_name=="GRAWITA" && $password!="grawitau" )
+if($mission_name=="GRAWITA" && $password!="grawita" )
 {
   echo "badpassword";
   exit();
 }
-if($mission_name=="FERMI" && $password!="fermiu" )
+if($mission_name=="FERMI" && $password!="fermi" )
 {
   echo "badpassword";
   exit();

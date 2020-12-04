@@ -40,7 +40,7 @@ if($mission_name=="FERMI" && $password!="fermi" )
   exit();
 }
 
-$dir_analysis = $config['dir_analysis']."//GRAWITA//".$_POST['grace_id']."/";
+$dir_analysis = $config['dir_analysis']."/".$_POST['grace_id']."/";
 
 if(!file_exists ( $dir_analysis )){
   mkdir($dir_analysis);

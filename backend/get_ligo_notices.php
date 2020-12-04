@@ -47,7 +47,7 @@
     # get array of job queued in jt.partition large t_submit
     $alert_list = array();
 
-    $query = "select name,time,noticetime,triggerid,seqnum,JSON_PRETTY(n.attributes) as 'attributes' from receivedsciencealert rsa join instrument i on(i.instrumentid = rsa.instrumentid) join  notice n on (n.receivedsciencealertid = rsa.receivedsciencealertid)  where i.name = 'LIGO' and n.notice!='injected.'  and n.seqnum in (select max(seqnum) from notice join receivedsciencealert rsalert on (rsalert.receivedsciencealertid = notice.receivedsciencealertid ) where triggerid = rsa.triggerid) order by triggerid desc";
+    $query = "select name,time,noticetime,triggerid,seqnum,JSON_PRETTY(n.attributes) as 'attributes' from receivedsciencealert rsa join instrument i on(i.instrumentid = rsa.instrumentid) join  notice n on (n.receivedsciencealertid = rsa.receivedsciencealertid)  where i.name = 'LIGO' and n.notice!='injected.' and noticetime > '2019-06-01' and n.seqnum in (select max(seqnum) from notice join receivedsciencealert rsalert on (rsalert.receivedsciencealertid = notice.receivedsciencealertid ) where triggerid = rsa.triggerid) order by triggerid desc";
     #$query = "select * from instrument";
 
 

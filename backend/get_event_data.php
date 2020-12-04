@@ -10,7 +10,7 @@ $config = getConfig();
 $dir_analysis = $config['dir_analysis'];
 $link_web_analysis = $config['link_web_analysis'];
 
-$results_dir = $dir_analysis."/GRAWITA/".$grace_id;
+$results_dir = $dir_analysis."/".$grace_id;
 
 $image_array = array();
 

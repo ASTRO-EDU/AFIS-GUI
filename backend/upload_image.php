@@ -68,7 +68,7 @@ else
     	echo "bad";
       exit();
   }
-
+  
 	if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) {
 
 		  chmod($uploadfile, 0664);

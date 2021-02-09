@@ -130,7 +130,7 @@
       cache: false,
       url:'backend/get_event_data.php',
       type:'get',
-      data: {'grace_id':grace_id,'trigger_time_utc':trigger_time_utc},
+      data: {'grace_id':grace_id,'trigger_time_utc':trigger_time_utc, "seqnum": seqnum},
       contentType: "application/json; charset=utf-8",
       async: true
 

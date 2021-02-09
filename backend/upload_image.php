@@ -51,7 +51,7 @@ $extension =  array('png','jpg',"jpeg");
 $file_extension = pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION);
 
 if(!in_array($file_extension,$extension) ) {
-    echo 'bad';
+    echo 'bad 1';
     exit();
 }
 else
@@ -65,7 +65,7 @@ else
 
   }
   else{
-    	echo "bad";
+    	echo "bad 2";
       exit();
   }
   
@@ -75,7 +75,7 @@ else
 
     	echo "good";
 	} else {
-    	echo "bad";
+    	echo "bad 3";
 }
 }
 ?>

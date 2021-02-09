@@ -2,6 +2,8 @@
 
 
 $grace_id = $_GET['grace_id'];
+$seqnum = $_GET['seqnum'];
+
 
 include '../config.php';
 
@@ -10,13 +12,13 @@ $config = getConfig();
 $dir_analysis = $config['dir_analysis'];
 $link_web_analysis = $config['link_web_analysis'];
 
-$results_dir = $dir_analysis."/".$grace_id;
+$results_dir = $dir_analysis."/".$grace_id."_".$seqnum;
 
 $image_array = array();
-
+#print($results_dir."AGILE/AGILE");
 $agile_image_array = array();
-foreach (glob($results_dir."/AGILE*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
-
+foreach (glob($results_dir."/AGILE/AGILE*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
+    #print($filename);
     $comment_path = str_replace(array(".png",".jpg",".jpeg"),".txt",$filename);
     $comment = file_get_contents($comment_path);
 
@@ -26,6 +28,7 @@ foreach (glob($results_dir."/AGILE*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
 }
 
 $image_array["agile"]=$agile_image_array;
+#print($image_array["agile"]);
 
 $grawita_image_array = array();
 foreach (glob($results_dir."/GRAWITA*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
@@ -42,7 +45,7 @@ $image_array["grawita"]=$grawita_image_array;
 
 
 $intgral_image_array = array();
-foreach (glob($results_dir."/INTEGRAL*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
+foreach (glob($results_dir."/INTEGRAL/INTEGRAL*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
 
     $comment_path = str_replace(array(".png",".jpg",".jpeg"),".txt",$filename);
     $comment = file_get_contents($comment_path);

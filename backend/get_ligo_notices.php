@@ -47,8 +47,7 @@
     # get array of job queued in jt.partition large t_submit
     $alert_list = array();
 
-    $query = "select name,time,noticetime,triggerid,seqnum,JSON_PRETTY(n.attributes) as 'attributes' from receivedsciencealert rsa join instrument i on(i.instrumentid = rsa.instrumentid) join  notice n on (n.receivedsciencealertid = rsa.receivedsciencealertid)  where i.name = 'LIGO' and n.notice!='injected.' and noticetime > '2019-06-01' and n.seqnum in (select max(seqnum) from notice join receivedsciencealert rsalert on (rsalert.receivedsciencealertid = notice.receivedsciencealertid ) where triggerid = rsa.triggerid) order by triggerid desc";
-    #$query = "select * from instrument";
+    $query = "select name,time,noticetime,triggerid,seqnum,notice,JSON_PRETTY(n.attributes) as 'attributes' from receivedsciencealert rsa join instrument i on(i.instrumentid = rsa.instrumentid) join  notice n on (n.receivedsciencealertid = rsa.receivedsciencealertid)  where (i.name = 'LIGO' or i.name = 'LIGO_TEST')  and noticetime > '2019-06-01' and n.seqnum in (select max(seqnum) from notice join receivedsciencealert rsalert on (rsalert.receivedsciencealertid = notice.receivedsciencealertid ) where triggerid = rsa.triggerid) order by triggerid desc";
 
 
     foreach ($dbh->query($query) as $row)
@@ -58,18 +57,48 @@
         $notice_time = $row['noticetime'];
         $triggerid = $row['triggerid'];
         $seqnum = $row['seqnum'];
-
+        $notice = $row["notice"];
+        
         $attributes = json_decode($row['attributes'],true);
-        $grace_id = $attributes['grace_id'];
-        #print($grace_id);
-        $bbh = $attributes['bbh'];
-        $nsbh = $attributes['nsbh'];
-        $bns = $attributes['bns'];
-        $terrestrial = $attributes['terrestrial'];
-        $far = $attributes['far'];
-        $mass_gap = $attributes['mass_gap'];
-        $has_ns = $attributes['has_ns'];
-        $has_remnant = $attributes['has_remnant'];
+        if($notice == "Injected." || empty($attributes))
+        {
+          #print("injected");
+          
+          #print_r($attributes);
+          $grace_id = "";#$attributes['grace_id'];
+          $bbh = "";
+          $nsbh = "";
+          $bns = "";#$attributes['bns'];
+          $terrestrial = "";
+          $far = "";
+          $mass_gap = "";
+          $has_ns = "";
+          $has_remnant = "";
+        }
+        else
+        {
+          // $attributes = json_decode($row['attributes'],true);
+          // $grace_id = $attributes['grace_id'];
+          // #print($grace_id);
+          // $bbh = $attributes['bbh'];
+          // $nsbh = $attributes['nsbh'];
+          // $bns = $attributes['bns'];
+          // $terrestrial = $attributes['terrestrial'];
+          // $far = $attributes['far'];
+          // $mass_gap = $attributes['mass_gap'];
+          // $has_ns = $attributes['has_ns'];
+          // $has_remnant = $attributes['has_remnant'];
+          #print_r($attributes);
+          $grace_id = $attributes['grace_id'];
+          $bbh = $attributes['bbh'];
+          $nsbh = $attributes['nsbh'];
+          $bns = $attributes['bns'];
+          $terrestrial = $attributes['terrestrial'];
+          $far = $attributes['far'];
+          $mass_gap = $attributes['mass_gap'];
+          $has_ns = $attributes['has_ns'];
+          $has_remnant = $attributes['has_remnant'];
+        }
 
 
         $link_results = "../analysis/grawita/LIGO-alert/".$grace_id;

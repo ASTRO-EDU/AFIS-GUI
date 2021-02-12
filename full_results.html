@@ -77,10 +77,10 @@
         title.id = 'comment_image'+id;
         title.innerHTML=title_txt;
 
-        var comment = document.createElement('pre');
+        //var comment = document.createElement('pre');
         //comment.className = 'text-center';
-        comment.id = 'comment_image'+id;
-        comment.innerHTML=comment_txt;
+        //comment.id = 'comment_image'+id;
+        //comment.innerHTML=comment_txt;
 
         var link = document.createElement('a');
         link.id = 'link_image_'+id;
@@ -95,7 +95,7 @@
         link.appendChild(img)
         column.appendChild(title)
         column.appendChild(link)
-        column.appendChild(comment)
+        //column.appendChild(comment)
         new_row_div.appendChild(column)
 
 
@@ -151,11 +151,11 @@
 
       ////////  FERMI
 
-      var fermi = document.createElement('h2');
-      fermi.innerHTML="FERMI DATA";
-      container.appendChild(fermi)
-      fermi_array = data_json['fermi']
-      add_images(fermi_array,container)
+      // var fermi = document.createElement('h2');
+      // fermi.innerHTML="FERMI DATA";
+      // container.appendChild(fermi)
+      // fermi_array = data_json['fermi']
+      // add_images(fermi_array,container)
 
       ////////  INTEGRAL
 
@@ -167,11 +167,11 @@
 
       ////////  GRAWITA
 
-      var grawita = document.createElement('h2');
-      grawita.innerHTML="GRAWITA DATA";
-      container.appendChild(grawita)
-      grawita_array = data_json['grawita']
-      add_images(grawita_array,container)
+      // var grawita = document.createElement('h2');
+      // grawita.innerHTML="GRAWITA DATA";
+      // container.appendChild(grawita)
+      // grawita_array = data_json['grawita']
+      // add_images(grawita_array,container)
 
 
 

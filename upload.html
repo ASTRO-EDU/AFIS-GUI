@@ -55,7 +55,7 @@
     //var file = new FormData(document.getElementById("upload"));
     var mission_name = document.getElementById("mission_name").value
     var password = document.getElementById("password").value
-    var comments = document.getElementById("image_comment").value
+    //var comments = document.getElementById("image_comment").value
 
 
     var file = new FormData(document.getElementById("upload"));
@@ -65,7 +65,7 @@
     form_data.append("grace_id", grace_id)
     form_data.append("mission_name", mission_name)
     form_data.append("password", password)
-    form_data.append("comments", comments)
+    //form_data.append("comments", comments)
     $.ajax({
       url: "backend/upload_image.php",
       type: "POST",

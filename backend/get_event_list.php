@@ -32,34 +32,48 @@
     $pipedir = $config['agilepipe_dir'];
 
     $instrument_name = $_GET['instrument_name'];
+    $ste_flag = $_GET['ste_flag'];
 
     $dbh = new PDO('mysql:host='.$config['host'].';dbname='.$config['database'].';port='.$config['port'],$config['username'],$config['password']);
+    $dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
     $instrument_query = "";
 
-    if($instrument_name!="all")
-    {
-      $instrument_query = "where i.name = '".$instrument_name."'";
-    }
-    else{
-      $instrument_query  = "where i.instrumentid!=19 ";
-    }
+    //if($instrument_name!="all")
+    //{
+    //  $instrument_query = "where i.name = '".$instrument_name."'";
+    //}
+    //else{
+    //  $instrument_query  = "where i.instrumentid!=19 ";
+    //}
 
     # get array of job queued in jt.partition large t_submit
     $alert_list = array();
 
-    $query = "select name,time,noticetime,triggerid,seqnum,notice,JSON_PRETTY(n.attributes) as 'attributes' from receivedsciencealert rsa join instrument i on(i.instrumentid = rsa.instrumentid) join  notice n on (n.receivedsciencealertid = rsa.receivedsciencealertid)  where i.name != 'LIGO_TEST'  and noticetime > '2019-06-01' and n.seqnum in (select max(seqnum) from notice join receivedsciencealert rsalert on (rsalert.receivedsciencealertid = notice.receivedsciencealertid ) where triggerid = rsa.triggerid) order by triggerid desc";
+    $query = "select name,time,noticetime,triggerid,seqnum,notice,JSON_PRETTY(n.attributes) as 'attributes' from receivedsciencealert rsa join instrument i on(i.instrumentid = rsa.instrumentid) join  notice n on (n.receivedsciencealertid = rsa.receivedsciencealertid)  where ste = :ste and i.name != :name  and noticetime > :noticetime and n.seqnum in (select max(seqnum) from notice join receivedsciencealert rsalert on (rsalert.receivedsciencealertid = notice.receivedsciencealertid ) where triggerid = rsa.triggerid) order by triggerid desc";
+    $sql = $dbh->prepare($query);
+    $name = "LIGO_TEST_remove";
+    $noticetime = '2019-06-01';
+    $sql->bindParam(':name', $name);
+    $sql->bindParam(':ste', $ste_flag);
+    $sql->bindParam(':noticetime', $noticetime);
+
+    
+    $sql->execute();
+    $result = $sql->fetchAll();
 
 
-    foreach ($dbh->query($query) as $row)
+
+    foreach ($result as $row)
     {
-        $intr_name = $row['name'];
+        $instr_name = $row['name'];
         $trigger_time = $row['time'];
         $notice_time = $row['noticetime'];
         $triggerid = $row['triggerid'];
         $seqnum = $row['seqnum'];
         $notice = $row["notice"];
-        
+         
         $attributes = json_decode($row['attributes'],true);
+        
         if($notice == "Injected." || empty($attributes))
         {
           $grace_id = "";#$attributes['grace_id'];
@@ -103,7 +117,7 @@
         exec($pipedir.'/visCheck/getdate mjd2i '.$mjd_time, $timeutc);
         $trigger_time_utc = $timeutc[0];
 
-        array_push($alert_list,array("intr_name"=>$intr_name,'has_remnant'=>$has_remnant,'has_ns'=>$has_ns,'mass_gap'=>$mass_gap,'far'=>$far,'terrestrial'=>$terrestrial,'bns'=>$bns,'nsbh'=>$nsbh,'bbh'=>$bbh,'grace_id'=>$grace_id,'trigger_time_utc'=>$trigger_time_utc,'link_results'=>$link_results,'trigger_time'=>$trigger_time,'notice_time'=>$notice_time,'triggerid'=>$triggerid,'seqnum'=>$seqnum));
+        array_push($alert_list,array("instr_name"=>$instr_name,'has_remnant'=>$has_remnant,'has_ns'=>$has_ns,'mass_gap'=>$mass_gap,'far'=>$far,'terrestrial'=>$terrestrial,'bns'=>$bns,'nsbh'=>$nsbh,'bbh'=>$bbh,'grace_id'=>$grace_id,'trigger_time_utc'=>$trigger_time_utc,'link_results'=>$link_results,'trigger_time'=>$trigger_time,'notice_time'=>$notice_time,'triggerid'=>$triggerid,'seqnum'=>$seqnum));
     }
 
     $response = array("alert_list"=>$alert_list);

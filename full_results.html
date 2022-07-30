@@ -40,7 +40,7 @@
 
   <link rel="stylesheet" type="text/css" href="css/grawita_gui.css">
 
-  <title>Super GRAWITA</title>
+  <title>AFISS</title>
 
   <!-- Bootstrap -->
   <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -110,13 +110,16 @@
   {
 
     var url = new URL(window.location.href);
-    grace_id = url.searchParams.get("grace_id");
+    instrument_name = url.searchParams.get("instrument_name");
+    trigger_id = url.searchParams.get("trigger_id");
     trigger_time_utc = url.searchParams.get("trigger_time_utc");
     seqnum = url.searchParams.get("seqnum");
 
-    document.getElementById("event_id").innerHTML=grace_id
-    document.getElementById("tzero_utc").innerHTML=trigger_time_utc
+    document.getElementById("instrument_name").innerHTML=instrument_name
+    document.getElementById("trigger_id").innerHTML=trigger_id
     document.getElementById("seqnum").innerHTML=seqnum
+    document.getElementById("tzero_utc").innerHTML=trigger_time_utc
+   
 
     var curr = new Date();
     console.log(curr)
@@ -130,7 +133,7 @@
       cache: false,
       url:'backend/get_event_data.php',
       type:'get',
-      data: {'grace_id':grace_id,'trigger_time_utc':trigger_time_utc, "seqnum": seqnum},
+      data: {'trigger_id':trigger_id,'trigger_time_utc':trigger_time_utc, "seqnum": seqnum,'instrument_name':instrument_name},
       contentType: "application/json; charset=utf-8",
       async: true
 
@@ -139,15 +142,18 @@
       console.log(data)
       var data_json = JSON.parse(data);
 
-      var container = document.getElementById("container")
+      var results_div = document.getElementById("results_div")
+
+      image_array = data_json.image_array
+      other_notice_list = data_json.other_notice_list
 
       ////////  AGILE
 
       var agile = document.createElement('h2');
       agile.innerHTML="AGILE DATA";
-      container.appendChild(agile)
-      agile_array = data_json['agile']
-      add_images(agile_array,container)
+      results_div.appendChild(agile)
+      agile_array = image_array['agile']
+      add_images(agile_array,results_div)
 
       ////////  FERMI
 
@@ -161,9 +167,9 @@
 
       var integral = document.createElement('h2');
       integral.innerHTML="INTEGRAL DATA";
-      container.appendChild(integral)
-      integral_array = data_json['integral']
-      add_images(integral_array,container)
+      results_div.appendChild(integral)
+      integral_array = image_array['integral']
+      add_images(integral_array,results_div)
 
       ////////  GRAWITA
 
@@ -172,7 +178,108 @@
       // container.appendChild(grawita)
       // grawita_array = data_json['grawita']
       // add_images(grawita_array,container)
+      
+      //se non ho allerte sovrapposte temporalmente non mostro la mappa contour
+      if(other_notice_list.length > 0)
+      {
+        console.log("other notices")
+        //document.getElementById("inter_error_regions_div").style.display="block"
+        //document.getElementById("inter_position_div").style.display="block"
+        document.getElementById("inter_title").innerHTML = "<font color='black'>Notices in &plusmn 10s </font>"
+        document.getElementById("inter_table_div").style.display="block"
 
+      }
+      else{
+        document.getElementById("inter_table_div").style.display="block"
+        document.getElementById("inter_title").innerHTML = "<font color='red'>No other Notices in &plusmn 10s </font>"
+      }
+
+      var dataSet = new Array();
+
+      for (var i = 0; i < other_notice_list.length; i++) {
+
+        var notice = other_notice_list[i]
+        var trigger_time_utc = notice.trigger_time_utc;
+        var trigger_time_tt = notice.trigger_time;
+        var instr_name = notice.instr_name;
+        var notice_time = notice.noticetime;
+        var triggerid = notice.triggerid;
+        var seqnum = notice.seqnum;
+        var link_run = notice.link_run;
+        var link_results = notice.link_results;
+        var grace_id = notice.grace_id
+
+        dataSet[i] = new Array();
+
+        for (var j = 0; j <=7; j++) {
+
+
+          if(j==0)
+          {
+            dataSet[i][j] =instr_name;
+          }
+          if(j==1)
+          {
+            dataSet[i][j] =trigger_time_tt;
+          }
+          if(j==2)
+          {
+            dataSet[i][j] =trigger_time_utc;
+          }
+          if(j==3)
+          {
+            dataSet[i][j] =notice_time;
+          }
+          if(j==4)
+          {
+            dataSet[i][j] =triggerid;
+          }
+          if(j==5){
+            dataSet[i][j] =seqnum;
+          }
+          if(j == 6)
+          {
+            dataSet[i][j] = grace_id;
+          }
+          if(j==7){
+            if(instr_name == "LIGO" || instr_name =="LIGO_TEST")
+              link_detail = "full_results.html?instrument_name="+instr_name+"&trigger_time_utc="+trigger_time_utc+"&trigger_id="+grace_id+"&seqnum="+seqnum;
+            else
+              link_detail = "full_results.html?instrument_name="+instr_name+"&trigger_time_utc="+trigger_time_utc+"&trigger_id="+triggerid+"&seqnum="+seqnum;
+            
+             dataSet[i][j] = '<button type="submit" onclick="window.open(\''+link_detail+'\'); return false;" 	class="btn btn-success" >Results</button><br>';           
+          }
+        }
+      }
+      if ( $.fn.dataTable.isDataTable('#other-table') ) // se la tabella esiste già
+      {
+        var table = new $.fn.dataTable.Api('#other-table').clear();
+        table.rows.add(dataSet).draw();
+      }
+      else
+      {
+        var table = $('#other-table').DataTable( {
+          //"autoWidth": true,
+          "lengthChange": false,
+          "searching": false,
+          "paging": false,
+          "ordering": false,
+          "info": false,
+          columns: [
+
+            { title: "Instrument Name" },
+            { title: "trigger time (TT)" },
+            { title: "trigger time (UTC)" },
+            { title: "notice time (UTC)" },
+            { title: "trigger id" },
+            { title: "seqnum" },
+            { title: "event id" },
+            { title: "links" },
+
+          ]
+        } );
+        table.rows.add(dataSet).draw();
+      }
 
 
     }).fail(function (jqXHR, textStatus) {
@@ -198,12 +305,13 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" id="website_name" href="index.html">Super GRAWITA</a>
+        <a class="navbar-brand" id="website_name" href="index.html">AFISS</a>
       </div>
 
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li ><a href="index.html">LIGO Events</a></li>
+          <li ><a href="index.html">Science Alerts</a></li>
+          <li ><a href="ste_events.html">Subtreshold Events</a></li>
           <li class="dropdown">
                   <p class="navbar-text" id="current_time_nav_bar"></p>
           </li>
@@ -218,8 +326,12 @@
       <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 ">
           <table>
             <tr>
-              <td style="text-align:right; padding-right:20px"><b>Event ID</b></td>
-              <td id="event_id" style="text-align:left"></td>
+              <td style="text-align:right; padding-right:20px"><b>Instrument Name</b></td>
+              <td id="instrument_name" style="text-align:left"></td>
+            </tr>
+            <tr>
+              <td style="text-align:right; padding-right:20px"><b>Trigger ID</b></td>
+              <td id="trigger_id" style="text-align:left"></td>
             </tr>
             <tr>
               <td style="text-align:right; padding-right:20px"><b>Seqnum</b></td>
@@ -239,7 +351,38 @@
         <h3>LIGO Notices</h3>
         <table id="alert-table" class = "table table-striped  dt-responsive" cellspacing="0" width="100%"> </table>
       </div>
+    </div>  
+
+    <!--<div  id="inter_map_div" class="row" style="padding-top:20px; padding-bottom:20px; display:none;" >
+      <h4 id="inter_title" >Inter Satellites Info</h4>
+      <div id="inter_position_div" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 " style="display:none">
+        <h5 class="text-center">Inter-satellites position during alert</h5>
+        <a  id="inter_position_link">
+          <img id="inter_position_img" class="img-responsive">
+        </a>
+
+      </div>
+      <div  id="inter_error_regions_div" class="col-lg-6 col-md-6 col-sm-6 col-xs-6 " style="display:none">
+        <h5 class="text-center">Inter-satellites error regions</h5>
+        <a id="inter_error_regions_link">
+          <img id="inter_error_regions_img" class="img-responsive">
+        </a>
+
+      </div>
+    </div>-->
+    <div id="results_div"  class="row" >
+      
     </div>
+
+
+    <div id="inter_table_div"  class="row" style="padding-top:20px; display:none;" >
+      <h4 id="inter_title" ></h4>
+      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 " id="other_table_div" >
+        <table id="other-table" class = "table nowrap" cellspacing="0" width="100%"> </table>
+      </div>
+    </div>
+
+ 
 
   </div><!-- /.container -->
 

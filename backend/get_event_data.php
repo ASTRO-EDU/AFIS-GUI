@@ -38,7 +38,7 @@ $image_array["agile"]=$agile_image_array;
 #print($image_array["agile"]);
 
 $grawita_image_array = array();
-foreach (glob($results_dir."/GRAWITA*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
+foreach (glob($results_dir."/GRAWITA/*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
 
     $comment_path = str_replace(array(".png",".jpg",".jpeg"),".txt",$filename);
     $comment = file_get_contents($comment_path);
@@ -52,7 +52,7 @@ $image_array["grawita"]=$grawita_image_array;
 
 
 $intgral_image_array = array();
-foreach (glob($results_dir."/INTEGRAL/INTEGRAL*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
+foreach (glob($results_dir."/INTEGRAL/*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
 
     $comment_path = str_replace(array(".png",".jpg",".jpeg"),".txt",$filename);
     $comment = file_get_contents($comment_path);
@@ -65,7 +65,7 @@ foreach (glob($results_dir."/INTEGRAL/INTEGRAL*.{jpg,jpeg,png}",GLOB_BRACE) as $
 $image_array["integral"]=$intgral_image_array;
 
 $fermi_image_array = array();
-foreach (glob($results_dir."/FERMI*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
+foreach (glob($results_dir."/FERMI/*.{jpg,jpeg,png}",GLOB_BRACE) as $filename) {
 
     $comment_path = str_replace(array(".png",".jpg",".jpeg"),".txt",$filename);
     $comment = file_get_contents($comment_path);
@@ -83,7 +83,7 @@ $image_array["fermi"]=$fermi_image_array;
 $trigger_time = -1;
 if($instrument_name == "LIGO_TEST" || $instrument_name == "LIGO")
 {   
- 
+    
     $query = "select time from receivedsciencealert rsa join instrument inst on (inst.instrumentid = rsa.instrumentid) join notice n on (n.receivedsciencealertid = rsa.receivedsciencealertid) where inst.name = :instrumentname and attributes->'$.grace_id' = :triggerid and seqnum = :seqnum";
     $sql = $dbh->prepare($query);
     $sql->bindParam(':instrumentname',$instrument_name);
@@ -104,7 +104,11 @@ if($instrument_name == "LIGO_TEST" || $instrument_name == "LIGO")
     }
    
 } else{
-    $query = "select time from receivedsciencealert rsa join instrument inst on (inst.instrumentid = rsa.instrumentid) join notice n on (n.receivedsciencealertid = rsa.receivedsciencealertid) where inst.name = :instrumentname and trigger_id = :triggerid and seqnum = :seqnum";
+
+    #echo($instrument_name." ".$seqnum." ".$trigger_id);
+
+    $query = "select time from receivedsciencealert rsa join instrument inst on (inst.instrumentid = rsa.instrumentid) join notice n on (n.receivedsciencealertid = rsa.receivedsciencealertid) where inst.name = :instrumentname and triggerid = :triggerid and seqnum = :seqnum";
+    
     $sql = $dbh->prepare($query);
     $sql->bindParam(':instrumentname',$instrument_name);
     $sql->bindParam(':seqnum', $seqnum);
@@ -128,7 +132,7 @@ $other_notice_list_notice_list = array();
       $noinstrid = 219;
       
       #get notice in time window
-      $query = "select ins.name,n.seqnum,n.noticetime,rsa.triggerid,rsa.time as 'trigger_time',ste,notice from notice n join receivedsciencealert rsa on ( rsa.receivedsciencealertid = n.receivedsciencealertid) join instrument ins on(ins.instrumentid = rsa.instrumentid) where  ins.name != :noticeintrname and rsa.instrumentid != :noinstrid and rsa.time > :triggertime1 and rsa.time < :triggertime2 and n.seqnum = (select max(seqnum) from notice n2 join receivedsciencealert rsa2 on ( rsa2.receivedsciencealertid = n2.receivedsciencealertid)  where  rsa.triggerid = rsa2.triggerid ) order by trigger_time ";
+      $query = "select ins.name,n.seqnum,n.noticetime,rsa.triggerid,rsa.time as 'trigger_time',ste,notice,JSON_PRETTY(n.attributes) as 'attributes' from notice n join receivedsciencealert rsa on ( rsa.receivedsciencealertid = n.receivedsciencealertid) join instrument ins on(ins.instrumentid = rsa.instrumentid) where  ins.name != :noticeintrname and rsa.instrumentid != :noinstrid and rsa.time > :triggertime1 and rsa.time < :triggertime2 and n.seqnum = (select max(seqnum) from notice n2 join receivedsciencealert rsa2 on ( rsa2.receivedsciencealertid = n2.receivedsciencealertid)  where  rsa.triggerid = rsa2.triggerid ) order by trigger_time ";
       $sql = $dbh->prepare($query);
       
       $trigger_time_1 = $trigger_time-10;
@@ -154,9 +158,10 @@ $other_notice_list_notice_list = array();
           $mjd_time = $trigger_time/86400.0+53005.0;
 
           $attributes = json_decode($row['attributes'],true);
-        
+         
           if($notice == "Injected." || empty($attributes))
           {
+            #echo "empty".$instr_name."\n";
             $grace_id = "";#$attributes['grace_id'];
             $bbh = "";
             $nsbh = "";
@@ -193,7 +198,7 @@ $other_notice_list_notice_list = array();
           $timeutc = array();
           exec($pipedir.'/visCheck/getdate mjd2i '.$mjd_time, $timeutc);
 
-
+          
 
           array_push($other_notice_list_notice_list,array('trigger_time_utc'=>$timeutc[0],'trigger_time'=>$trigger_time,'noticetime'=>$noticetime,'instr_name'=>$instr_name,'triggerid'=>$triggerid,'seqnum'=>$seqnum,'grace_id'=>$grace_id));
       }

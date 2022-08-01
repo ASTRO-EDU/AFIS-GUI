@@ -151,11 +151,18 @@
           }
           if(j==8){
 
-            link_upload = "upload.html?grace_id="+grace_id;
-            link_full = "full_results.html?grace_id="+grace_id+"&trigger_time_utc="+trigger_time_utc+"&seqnum="+seqnum;
+            if(instr_name == "LIGO" || instr_name =="LIGO_TEST")
+              link_upload = "upload.html?instrument_name="+instr_name+"&trigger_id="+grace_id+"&sequence_number="+seqnum
+            else
+              link_upload = "upload.html?instrument_name="+instr_name+"&trigger_id="+triggerid+"&sequence_number="+seqnum
+            if(instr_name == "LIGO" || instr_name =="LIGO_TEST")
+              link_full = "full_results.html?instrument_name="+instr_name+"&trigger_time_utc="+trigger_time_utc+"&trigger_id="+grace_id+"&seqnum="+seqnum;
+            else
+              link_full = "full_results.html?instrument_name="+instr_name+"&trigger_time_utc="+trigger_time_utc+"&trigger_id="+triggerid+"&seqnum="+seqnum;
+            
             dataSet[i][j] = '<button type="submit" onclick="window.open(\''+link_full+'\'); return false;" 	class="btn btn-success" >Results</button><br>';
             dataSet[i][j] += '<button type="submit" style="margin-top:10px;"   onclick="window.open(\''+link_upload+'\'); return false;" 	class="btn btn-success" >Upload Data</button><br>';
-          }
+         }
         }
 
 

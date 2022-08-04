@@ -49,7 +49,7 @@
     # get array of job queued in jt.partition large t_submit
     $alert_list = array();
 
-    $query = "select name,time,noticetime,triggerid,seqnum,notice,JSON_PRETTY(n.attributes) as 'attributes' from receivedsciencealert rsa join instrument i on(i.instrumentid = rsa.instrumentid) join  notice n on (n.receivedsciencealertid = rsa.receivedsciencealertid)  where ste = :ste and i.name != :name  and noticetime > :noticetime and n.seqnum in (select max(seqnum) from notice join receivedsciencealert rsalert on (rsalert.receivedsciencealertid = notice.receivedsciencealertid ) where triggerid = rsa.triggerid) order by triggerid desc";
+    $query = "select name,time,noticetime,triggerid,seqnum,notice,JSON_PRETTY(n.attributes) as 'attributes' from receivedsciencealert rsa join instrument i on(i.instrumentid = rsa.instrumentid) join  notice n on (n.receivedsciencealertid = rsa.receivedsciencealertid)  where ste = :ste and i.name != :name  and noticetime > :noticetime and n.seqnum in (select max(seqnum) from notice join receivedsciencealert rsalert on (rsalert.receivedsciencealertid = notice.receivedsciencealertid ) where triggerid = rsa.triggerid) ";
     $sql = $dbh->prepare($query);
     $name = "LIGO_TEST_remove";
     $noticetime = '2019-06-01';

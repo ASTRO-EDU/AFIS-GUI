@@ -132,7 +132,7 @@ $other_notice_list_notice_list = array();
       $noinstrid = 219;
       
       #get notice in time window
-      $query = "select ins.name,n.seqnum,n.noticetime,rsa.triggerid,rsa.time as 'trigger_time',ste,notice,JSON_PRETTY(n.attributes) as 'attributes' from notice n join receivedsciencealert rsa on ( rsa.receivedsciencealertid = n.receivedsciencealertid) join instrument ins on(ins.instrumentid = rsa.instrumentid) where  ins.name != :noticeintrname and rsa.instrumentid != :noinstrid and rsa.time > :triggertime1 and rsa.time < :triggertime2 and n.seqnum = (select max(seqnum) from notice n2 join receivedsciencealert rsa2 on ( rsa2.receivedsciencealertid = n2.receivedsciencealertid)  where  rsa.triggerid = rsa2.triggerid ) order by trigger_time ";
+      $query = "select ins.name,n.seqnum,n.noticetime,rsa.triggerid,rsa.time as 'trigger_time',ste,notice,JSON_PRETTY(n.attributes) as 'attributes' from notice n join receivedsciencealert rsa on ( rsa.receivedsciencealertid = n.receivedsciencealertid) join instrument ins on(ins.instrumentid = rsa.instrumentid) where  ins.name != :noticeintrname and rsa.instrumentid != :noinstrid and rsa.time > :triggertime1 and rsa.time < :triggertime2 and n.seqnum = (select max(seqnum) from notice n2 join receivedsciencealert rsa2 on ( rsa2.receivedsciencealertid = n2.receivedsciencealertid)  where  rsa.triggerid = rsa2.triggerid ) order by n.noticetime ";
       $sql = $dbh->prepare($query);
       
       $trigger_time_1 = $trigger_time-10;

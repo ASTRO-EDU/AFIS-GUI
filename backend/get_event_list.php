@@ -104,7 +104,7 @@
           $bns = $attributes['bns'];
           $terrestrial = $attributes['terrestrial'];
           $far = $attributes['far'];
-          $mass_gap = $attributes['mass_gap'];
+          $mass_gap = $attributes['has_mass_gap'];
           $has_ns = $attributes['has_ns'];
           $has_remnant = $attributes['has_remnant'];
         }
